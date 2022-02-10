@@ -74,8 +74,20 @@ public class UserEntity {
 
 	@Override
 	public String toString() {
-		return "UserEntity [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName
-				+ ", password=" + password + ", mobile=" + mobile + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("UserEntity [id=");
+		builder.append(id);
+		builder.append(", firstName=");
+		builder.append(firstName);
+		builder.append(", lastName=");
+		builder.append(lastName);
+		builder.append(", userName=");
+		builder.append(userName);
+		builder.append(", password=");
+		builder.append(password);
+		builder.append(", mobile=");
+		builder.append(mobile);
+		builder.append("]");
+		return builder.toString();
 	}
-
 }

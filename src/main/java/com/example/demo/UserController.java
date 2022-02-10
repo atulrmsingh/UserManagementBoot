@@ -37,8 +37,8 @@ public class UserController {
 	@PostMapping
 	@RequestMapping("addUser")
 	public String addUser(@RequestBody UserEntity user1) {
-		UserEntity user = us.addUser(user1);
-		return user.toString();
+		String user = us.addUser(user1);
+		return user;
 	}
 
 	@PostMapping

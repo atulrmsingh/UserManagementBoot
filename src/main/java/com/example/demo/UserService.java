@@ -5,7 +5,7 @@ import java.util.List;
 public interface UserService {
 	public List<UserEntity> getAllUsers();
 
-	public UserEntity addUser(UserEntity user);
+	public String addUser(UserEntity user);
 
 	public UserEntity getUserById(int id);
 

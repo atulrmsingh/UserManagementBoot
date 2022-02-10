@@ -3,6 +3,8 @@ package com.example.demo;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -13,14 +15,17 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 public class UserServiceImpl implements UserService {
+	
 	@Autowired
-
 	UserRepository userRepositry;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public List<UserEntity> getAllUsers() {
@@ -28,8 +33,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserEntity addUser(UserEntity user) {
-		return userRepositry.save(user);
+	public String addUser(UserEntity user) {
+		if(checkPattern(user.getUserName(), "email")){
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+			userRepositry.save(user);
+			return "User Added Successfully!";
+		}else{
+			return "Invalid Email Please use correct email format";
+		}
+		
 	}
 
 	@Override
@@ -40,7 +52,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void deleteUserById(int id) {
 		userRepositry.deleteById(id);
-
+		
 	}
 
 	@Override
@@ -58,7 +70,8 @@ public class UserServiceImpl implements UserService {
 		List<UserEntity> userList = userRepositry.findAll();
 		for (UserEntity userEntity : userList) {
 			if (userEntity.getUserName().equals(userName)) {
-				if (userEntity.getPassword().equals(password)) {
+				boolean passResult = passwordEncoder.matches(password, userEntity.getPassword());
+				if (passResult) {
 					return "loggedin";
 				}
 
@@ -96,7 +109,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void sendEmail(UserEntity user) {
+	public void sendEmail(final UserEntity user) {
 
 		Runnable task = new Runnable() {
 
@@ -133,6 +146,24 @@ public class UserServiceImpl implements UserService {
 		};
 		new Thread(task).start();
 
+	}
+	
+	public boolean checkPattern(String value,String field) {
+		boolean result = false;
+		Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$");
+		Pattern mobPattern = Pattern.compile("[6-9][0-9]{9}");
+		if(field.equals("email")) {
+			Matcher emailMatch = emailPattern.matcher(value);
+			if(emailMatch.matches()) {
+				result = true;
+			}
+		}else if(field.equals("mobile")) {
+			Matcher mobileMatch = mobPattern.matcher(value);
+			if(mobileMatch.matches()) {
+				result = true;
+			}		
+		}
+		return result;		
 	}
 
 }
